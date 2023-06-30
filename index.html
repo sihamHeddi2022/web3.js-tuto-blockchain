@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        Hello Web3 !!
+    </title>
+</head>
+<body>
+    <center>
+        <h1>
+            My members :  
+        </h1>
+
+          <ul id="members">
+
+          </ul>
+         
+        
+
+         <form  method="post" id="form" >
+            <input type="text" name="enter a name" id="name"/>
+            <input type="submit" placeholder="send Ether">
+         </form>
+
+    </center>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/4.0.2/web3.min.js"></script>
+    <script>
+
+    const web3 = new Web3(Web3.givenProvider || "http://127.0.0.1:7545");
+
+
+     web3.eth.defaultAccount= web3.eth.accounts[0];
+     
+     const cabi =[
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "m",
+				"type": "string"
+			}
+		],
+		"name": "addMember",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getArrayLength",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "member",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+     const address = '0xCd49540A5258A275693B9A9fb3C045e5175f3932'
+
+     const contract = new web3.eth.Contract(cabi,address);
+      
+      const list = document.getElementById("members")
+      
+      const getContents=async()=>{
+             list.innerHTML=""
+             const length= await contract.methods.getArrayLength().call()
+                console.log(length);
+
+            for (let i = 0; i < length; i++) {
+
+            const value = await contract.methods.member(i).call();
+            let liElement = document.createElement('li');
+
+            liElement.textContent = value
+            list.append(liElement)
+            }
+
+        
+      }
+     
+      const form = document.getElementById("form")
+        
+      form.addEventListener('submit',async(e)=>{
+             e.preventDefault()
+             
+             const input1Value = document.getElementById('name').value;
+             //console.log(input1Value);
+             await contract.methods.addMember(input1Value).send({from:'0x1Da42e42527C10B4D51ec20839E6f10D2df5DE87'})
+             setTimeout(()=>  getContents(),3000)
+        })
+         getContents()
+
+    </script>
+
+</body>
+</html>
